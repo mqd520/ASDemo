@@ -1,0 +1,75 @@
+public class LoadSwfSource
+{
+   private var ld:Loader;
+   private var url:String;
+   private var className:String;
+   private var x:int;
+   private var y:int;
+   private var stage:Stage;
+ 
+   public function LoadSwfSource(url:String , className:String , x:int , y:int , stage:Stage)
+  {
+    this.url = url;
+    this.className = className;
+    this.x = x;
+    this.y = y;
+    this.stage = stage;
+    init();
+  }
+ private function init():void
+ {
+    ld = new Loader();
+    ld.contentLoaderInfo.addEventListener(Event.COMPLETE,loadCompleted);
+    ld.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,ioErrHandler);
+    ld.contentLoaderInfo.addEventListener  (SecurityErrorEvent.SECURITY_ERROR,securityErrHandler);
+   loadSWF():
+}
+
+private function loadSWF():void
+{
+  
+  var req:URLRequest = new URLRequest(url);
+  var context:LoaderContext = new LoaderContext(false,ApplicationDomain.currentDomain,null);
+   req.contentType = "";
+   ld.load(req,context);
+}
+ 
+private function show(className:String):void
+{
+   var cls:Class = loadClassDefinition(className);
+    if(cls)
+    { 
+       var o:DisplayObject = new cls();
+       stage.addChild(o);
+       o.x = x;
+       o.y = y;
+    }
+}
+ 
+private function loadCompleted(e:Event):void
+{
+   trace("[" + e.target.url + "] loaded¡±);
+   show(className);
+ }
+
+private function ioErrHandler(e:IOErrorEvent):void
+{
+     trace(e.text);
+ }
+
+private function securityErrHandler(e:IOErrorEvent):void
+{
+   trace(e.text);
+}
+
+private function loadClassDefinition(sClassName:String):Class
+{
+    var cls:Class = null;
+    try
+    {
+       cls = ld.contentLoaderInfo.applicationDomain.getDefinition(sClassName) as Class;
+        return cls;
+     }catch(e:Error){ throw new IllegalOperationError(sClassName + ¡± doesn¡¯t exist¡±);}
+     return cls;
+ }
+}
